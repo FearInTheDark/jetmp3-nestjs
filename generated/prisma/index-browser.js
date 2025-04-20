@@ -121,17 +121,49 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
+  password: 'password',
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SongScalarFieldEnum = {
+exports.Prisma.ArtistScalarFieldEnum = {
   id: 'id',
-  title: 'title',
+  artistId: 'artistId',
+  name: 'name',
   uri: 'uri',
+  popularity: 'popularity',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  width: 'width',
+  height: 'height',
+  artistId: 'artistId',
+  songId: 'songId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TrackScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  uri: 'uri',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  duration_ms: 'duration_ms',
+  artistId: 'artistId'
+};
+
+exports.Prisma.ListenHistoryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  songId: 'songId',
+  duration: 'duration',
+  listenedAt: 'listenedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -143,6 +175,11 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
 exports.Role = exports.$Enums.Role = {
   USER: 'USER',
   ADMIN: 'ADMIN',
@@ -151,7 +188,10 @@ exports.Role = exports.$Enums.Role = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Song: 'Song'
+  Artist: 'Artist',
+  Image: 'Image',
+  Track: 'Track',
+  ListenHistory: 'ListenHistory'
 };
 
 /**
