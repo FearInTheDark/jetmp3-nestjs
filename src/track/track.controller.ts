@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { Prisma } from "generated/prisma";
+import { Prisma } from '@prisma/client';
 
-@Controller('track')
+@Controller('tracks')
 export class TrackController {
 	constructor(private readonly trackService: TrackService) {
 	}

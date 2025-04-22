@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 // prisma/schema.prisma
@@ -49,8 +48,8 @@ model Image {
   url       String
   width     Int
   height    Int
-  artistId  Int?
-  artist    Artist?  @relation(fields: [artistId], references: [id])
+  artistId  String?
+  artist    Artist?  @relation(fields: [artistId], references: [artistId])
   track     Track?   @relation(fields: [songId], references: [id])
   songId    Int?
   createdAt DateTime @default(now())
@@ -66,8 +65,8 @@ model Track {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   duration_ms     Int?
-  artistId        Int
-  artist          Artist          @relation(fields: [artistId], references: [id])
+  artistId        String
+  artist          Artist          @relation(fields: [artistId], references: [artistId])
   listenHistories ListenHistory[]
   images          Image[]
 

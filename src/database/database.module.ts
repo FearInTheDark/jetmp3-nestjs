@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
-import { DatabaseService } from "src/database/database.service";
+import { Global, Module } from '@nestjs/common';
+import { DatabaseService } from '../database/database.service';
 
+@Global()
 @Module({
 	providers: [DatabaseService],
 	exports: [DatabaseService]

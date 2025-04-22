@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { $Enums, Prisma } from "generated/prisma";
+import { $Enums, Prisma } from '@prisma/client';
+import { AuthGuard } from 'src/auth/auth.guard';
 import Role = $Enums.Role;
 
-@Controller('user')
+@Controller('users')
+@UseGuards(AuthGuard)
 export class UserController {
 	constructor(private readonly userService: UserService) {
 	}

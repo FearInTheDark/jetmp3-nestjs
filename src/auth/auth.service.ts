@@ -1,13 +1,20 @@
-import * as argon from "argon2"
-import { AuthDto } from "src/auth/dto";
-import { Prisma } from "generated/prisma";
+import * as argon from 'argon2';
+import { AuthDto } from 'src/auth/dto';
+import { Prisma } from '@prisma/client';
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { DatabaseService } from "src/database/database.service";
+import { DatabaseService } from 'src/database/database.service';
+import { JwtService } from '@nestjs/jwt';
+import * as process from 'node:process';
+import { ConfigService } from '@nestjs/config';
 import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
 
 @Injectable()
 export class AuthService {
-	constructor(private readonly databaseService: DatabaseService) {
+	constructor(
+		private readonly databaseService: DatabaseService,
+		private readonly jwtService: JwtService,
+		private readonly configService: ConfigService
+	) {
 	}
 	
 	async signup(dto: AuthDto) {
@@ -32,6 +39,27 @@ export class AuthService {
 			where: {
 				email: dto.email
 			}
+		})
+		if (!user) throw new ForbiddenException("Credentials incorrect", {description: "The email or password is incorrect"})
+		
+		const passwordMatches = argon.verify(user.password, dto.password)
+		if (!passwordMatches) throw new ForbiddenException("Credentials incorrect", {description: "The email or password is incorrect"})
+		
+		return {
+			access_token: await this.signToken(user.id, user.email),
+			expired_in: this.configService.get<string>('JWT_EXPIRED_IN') || process.env.JWT_EXPIRED_IN,
+		}
+	}
+	
+	async signToken(userId: number, email: string): Promise<string> {
+		const payload = {
+			userId,
+			email,
+		}
+		
+		return this.jwtService.signAsync(payload, {
+			expiresIn: "15m",
+			secret: this.configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET,
 		})
 	}
 }
