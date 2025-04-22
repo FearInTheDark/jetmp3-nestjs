@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { Prisma } from '@prisma/client';
+import { AuthGuard } from 'src/auth/auth.guard';
 import ArtistUpdateInput = Prisma.ArtistUpdateInput;
 
 @Controller('artists')
+@UseGuards(AuthGuard)
 export class ArtistController {
 	constructor(private readonly artistService: ArtistService) {
 	}

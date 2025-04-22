@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Prisma } from '@prisma/client';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('tracks')
+@UseGuards(AuthGuard)
 export class TrackController {
 	constructor(private readonly trackService: TrackService) {
 	}
