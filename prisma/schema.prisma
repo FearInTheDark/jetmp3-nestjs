@@ -86,6 +86,16 @@ model ListenHistory {
   @@map("listen_histories")
 }
 
+model Todo {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("todos")
+}
+
 enum Role {
   USER
   ADMIN

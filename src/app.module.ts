@@ -8,13 +8,14 @@ import { ArtistModule } from './artist/artist.module';
 import { ConfigModule } from "@nestjs/config";
 import { SharedJwtModule } from "src/common/modules/shared-jwt.module";
 import { DatabaseModule } from "src/database/database.module";
+import { TodoModule } from './todo/todo.module';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({isGlobal: true}),
 		SharedJwtModule,
 		DatabaseModule,
-		UserModule, AuthModule, TrackModule, ArtistModule],
+		UserModule, AuthModule, TrackModule, ArtistModule, TodoModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
