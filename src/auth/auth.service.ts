@@ -42,7 +42,7 @@ export class AuthService {
 		})
 		if (!user) throw new ForbiddenException("Credentials incorrect", {description: "The email or password is incorrect"})
 		
-		const passwordMatches = argon.verify(user.password, dto.password)
+		const passwordMatches = await argon.verify(user.password, dto.password)
 		if (!passwordMatches) throw new ForbiddenException("Credentials incorrect", {description: "The email or password is incorrect"})
 		
 		return {
