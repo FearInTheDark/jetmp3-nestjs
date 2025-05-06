@@ -20,13 +20,17 @@ export class AuthService {
 	async signup(dto: AuthDto) {
 		const hash = await argon.hash(dto.password, {type: argon.argon2id})
 		try {
-			return await this.databaseService.user.create({
+			const user = await this.databaseService.user.create({
 				data: {
-					...(dto.name && {name: dto.name}),
-					...dto,
+					email: dto.email,
 					password: hash,
-				},
+					name: dto.name
+				}
 			})
+			return {
+				access_token: await this.signToken(user.id, user.email),
+				expired_in: this.configService.get<string>('JWT_EXPIRED_IN') || process.env.JWT_EXPIRED_IN,
+			}
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002')
 				throw new ForbiddenException("Credentials taken", {description: "The email or username is already taken"})
