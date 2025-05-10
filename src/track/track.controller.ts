@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@n
 import { TrackService } from './track.service';
 import { Prisma } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { TrackCreateInputWithImages } from 'src/track/dto/TrackCreateWithImages';
 
 @Controller('tracks')
 @UseGuards(AuthGuard)
@@ -12,6 +13,11 @@ export class TrackController {
 	@Post()
 	create(@Body() createTrackDto: Prisma.TrackCreateInput) {
 		return this.trackService.create(createTrackDto);
+	}
+	
+	@Post("images")
+	createWithImages(@Body() trackWithImages: TrackCreateInputWithImages) {
+		return this.trackService.createWithImages(trackWithImages)
 	}
 	
 	@Get()
