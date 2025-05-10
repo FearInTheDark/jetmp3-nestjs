@@ -36,4 +36,21 @@ export class ArtistService {
 			where: {id},
 		});
 	}
+
+	async getTracksByArtistId(artistId: string, page = 1, size = 10) {
+		const skip = (page - 1) * size;
+
+		return this.databaseService.track.findMany({
+			where: {
+				artistId: artistId,
+			},
+			include: {
+				images: true,
+				Favorite: true,
+				listenHistories: true
+			},
+			skip,
+			take: size
+		});
+	}
 }

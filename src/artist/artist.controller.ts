@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { Prisma } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -18,6 +18,11 @@ export class ArtistController {
 	@Get()
 	findAll() {
 		return this.artistService.findAll();
+	}
+	
+	@Get(':artistId/tracks')
+	getTracks(@Param('artistId') artistId: string, @Query('page') page: number, @Query('size') size: number) {
+		return this.artistService.getTracksByArtistId(artistId, page, size);
 	}
 	
 	@Get(':id')
