@@ -6,12 +6,12 @@ export class FavoriteService {
   constructor(private readonly databaseService: DatabaseService) {
   }
   
-  async toggleUserFavorite(userId: number, songId: number) {
-    console.log(`userID: ${userId}, songId: ${songId}`);
+  async toggleUserFavorite(userId: number, trackId: number) {
+    console.log(`userID: ${userId}, trackId: ${trackId}`);
     const existingFavorite = await this.databaseService.favorite.findFirst({
       where: {
         userId,
-        songId,
+        trackId,
       },
     });
     
@@ -30,7 +30,7 @@ export class FavoriteService {
     return await this.databaseService.favorite.create({
       data: {
         userId,
-        songId,
+        trackId,
       },
     }) && {
       message: 'Favorite added successfully',
@@ -48,7 +48,7 @@ export class FavoriteService {
       this.databaseService.favorite.findMany({
         where: { userId },
         include: {
-          song: {
+          track: {
             include: { images: true },
           },
         },
@@ -61,16 +61,16 @@ export class FavoriteService {
     ]);
     
     return {
-      data: favorites.map(fav => fav.song),
+      data: favorites.map(fav => fav.track),
       total,
       page,
       size,
     };
   }
   
-  async getTrackIsFavoriteBy(songId: number) {
+  async getTrackIsFavoriteBy(trackId: number) {
     const favorites = await this.databaseService.favorite.findMany({
-      where: { songId },
+      where: { trackId },
     });
     
     return {

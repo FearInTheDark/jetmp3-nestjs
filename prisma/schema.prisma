@@ -45,12 +45,10 @@ model Artist {
 model Image {
   id       Int     @id @default(autoincrement())
   url      String
-  width    Int
-  height   Int
   artistId String?
   artist   Artist? @relation(fields: [artistId], references: [artistId], onDelete: Cascade)
-  track    Track?  @relation(fields: [songId], references: [id], onDelete: Cascade)
-  songId   Int?
+  track    Track?  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId  Int?
 
   @@map("images")
 }
@@ -75,23 +73,23 @@ model ListenHistory {
   id         Int      @id @default(autoincrement())
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
-  song       Track    @relation(fields: [songId], references: [id], onDelete: Cascade)
-  songId     Int
+  track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId    Int
   duration   Int
   listenedAt DateTime @default(now())
 
-  @@unique([userId, songId, listenedAt])
+  @@unique([userId, trackId, listenedAt])
   @@map("listen_histories")
 }
 
 model Favorite {
-  id     Int   @id @default(autoincrement())
-  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
-  song   Track @relation(fields: [songId], references: [id], onDelete: Cascade)
-  songId Int
+  id      Int   @id @default(autoincrement())
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  track   Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId Int
 
-  @@unique([userId, songId])
+  @@unique([userId, trackId])
   @@map("favorites")
 }
 

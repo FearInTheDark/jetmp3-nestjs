@@ -15,7 +15,16 @@ export class TrackService {
 	}
 	
 	async findAll() {
-		return this.databaseService.track.findMany();
+		const tracks =  await this.databaseService.track.findMany({
+			include: {
+				images: true
+			},
+		});
+		
+		return tracks.map(track => ({
+			...track,
+			images: track.images.map(e => e.url)
+		}))
 	}
 	
 	async findOne(id: number) {
