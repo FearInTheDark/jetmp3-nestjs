@@ -16,8 +16,10 @@ export class ArtistController {
 	}
 	
 	@Get()
-	findAll() {
-		return this.artistService.findAll();
+	findAll(
+		@Query("ids") ids?: string
+	) {
+		return this.artistService.findAll(ids);
 	}
 	
 	@Get(':artistId/tracks')
@@ -25,9 +27,9 @@ export class ArtistController {
 		return this.artistService.getTracksByArtistId(artistId, page, size);
 	}
 	
-	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.artistService.findOne(+id);
+	@Get(':artistId')
+	findOne(@Param('artistId') artistId: string) {
+		return this.artistService.findOne(artistId);
 	}
 	
 	@Patch(':id')
