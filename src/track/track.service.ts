@@ -36,10 +36,12 @@ export class TrackService {
 		};
 	}
 	
-	async findAll() {
+	async findAll(img?: boolean) {
 		const tracks =  await this.databaseService.track.findMany({
 			include: {
-				images: true
+				images: !!img,
+				Favorite: true,
+				listenHistories: true,
 			},
 		});
 		
