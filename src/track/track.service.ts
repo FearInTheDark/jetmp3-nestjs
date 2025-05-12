@@ -36,10 +36,10 @@ export class TrackService {
 		};
 	}
 	
-	async findAll(img?: boolean) {
+	async findAll(img: boolean, favorite: boolean, userId: number) {
 		const tracks =  await this.databaseService.track.findMany({
 			include: {
-				images: !!img,
+				images: img,
 				Favorite: true,
 				listenHistories: true,
 			},
@@ -47,7 +47,8 @@ export class TrackService {
 		
 		return tracks.map(track => ({
 			...track,
-			images: track.images.map(e => e.url)
+			images: img ? track.images.map(e => e.url) : undefined,
+			Favorite: favorite ? track.Favorite : track.Favorite.some(e => e.userId === userId),
 		}))
 	}
 	

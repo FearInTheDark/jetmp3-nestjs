@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Prisma } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -22,9 +22,11 @@ export class TrackController {
 	
 	@Get()
 	findAll(
-		@Query("img") img?: boolean,
+		@Query("img") img: boolean = true,
+		@Query("favorite") favorite: boolean = false,
+		@Req() req: any
 	) {
-		return this.trackService.findAll(img);
+		return this.trackService.findAll(img, favorite, req.user.id);
 	}
 	
 	@Get(':id')
