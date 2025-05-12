@@ -5,69 +5,72 @@ import { TrackCreateInputWithImages } from 'src/track/dto/TrackCreateWithImages'
 
 @Injectable()
 export class TrackService {
-	constructor(private readonly databaseService: DatabaseService) {
-	}
-	
-	
-	async create(createTrackDto: Prisma.TrackCreateInput) {
-		return this.databaseService.track.create({
-			data: createTrackDto,
-		});
-	}
-	
-	async createWithImages(createTrackWithImagesDto: TrackCreateInputWithImages) {
-		const { images, ...trackData } = createTrackWithImagesDto;
-		
-		const track = await this.databaseService.track.create({
-			data: {
-				...trackData,
-				images: {
-					create: images?.map(image => ({ url: image })),
-				},
-			},
-			include: {
-				images: true,
-			},
-		});
-		
-		return {
-			...track,
-			images: track.images.map(e => e.url)
-		};
-	}
-	
-	async findAll(img: boolean, favorite: boolean, userId: number) {
-		const tracks =  await this.databaseService.track.findMany({
-			include: {
-				images: img,
-				Favorite: true,
-				listenHistories: true,
-			},
-		});
-		
-		return tracks.map(track => ({
-			...track,
-			images: img ? track.images.map(e => e.url) : undefined,
-			Favorite: favorite ? track.Favorite : track.Favorite.some(e => e.userId === userId),
-		}))
-	}
-	
-	async findOne(id: number) {
-		return this.databaseService.track.findUnique({
-			where: { id },
-		});
-	}
-	
-	async update(id: number, updateTrackDto: Prisma.TrackUpdateInput) {
-		return this.databaseService.track.update({
-			where: { id },
-			data: updateTrackDto,
-		});
-	}
-	
-	async remove(id: number) {
-		return this.databaseService.track.delete({
-			where: { id },
-		});
-	}
+  constructor(private readonly databaseService: DatabaseService) {
+  }
+  
+  
+  async create(createTrackDto: Prisma.TrackCreateInput) {
+    return this.databaseService.track.create({
+      data: createTrackDto,
+    });
+  }
+  
+  async createWithImages(createTrackWithImagesDto: TrackCreateInputWithImages) {
+    const { images, ...trackData } = createTrackWithImagesDto;
+    
+    const track = await this.databaseService.track.create({
+      data: {
+        ...trackData,
+        images: {
+          create: images?.map(image => ({ url: image })),
+        },
+      },
+      include: {
+        images: true,
+      },
+    });
+    
+    return {
+      ...track,
+      images: track.images.map(e => e.url),
+    };
+  }
+  
+  async findAll(img: boolean, favorite: boolean, userId: number) {
+    const tracks = await this.databaseService.track.findMany({
+      include: {
+        images: img,
+        Favorite: {
+          where: { userId: userId },
+          select: { userId: true },
+        },
+        listenHistories: true,
+      },
+    });
+    console.log(tracks.map(e => e.Favorite));
+    return tracks.map(track => ({
+      ...track,
+      images: img ? track.images.map(e => e.url) : undefined,
+      Favorite: favorite ? track.Favorite : track.Favorite.length > 0,
+    }));
+  }
+  
+  async findOne(id: number) {
+    return this.databaseService.track.findUnique({
+      where: { id },
+    });
+  }
+  
+  async update(id: number, updateTrackDto: Prisma.TrackUpdateInput) {
+    return this.databaseService.track.update({
+      where: { id },
+      data: updateTrackDto,
+    });
+  }
+  
+  async remove(id: number) {
+    return this.databaseService.track.delete({
+      where: { id },
+    });
+  }
 }
