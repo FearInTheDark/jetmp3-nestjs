@@ -23,7 +23,7 @@ export class FavoriteService {
       }) && {
         message: 'Favorite removed successfully',
         success: true,
-        action: 'removed',
+        action: 'REMOVED',
       };
     }
     
@@ -35,7 +35,7 @@ export class FavoriteService {
     }) && {
       message: 'Favorite added successfully',
       success: true,
-      action: 'added',
+      action: 'ADDED',
     };
   }
   
