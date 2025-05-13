@@ -22,7 +22,6 @@ export class FavoriteService {
         },
       }) && {
         message: 'Favorite removed successfully',
-        success: true,
         action: 'REMOVED',
       };
     }
@@ -34,7 +33,6 @@ export class FavoriteService {
       },
     }) && {
       message: 'Favorite added successfully',
-      success: true,
       action: 'ADDED',
     };
   }
@@ -61,7 +59,10 @@ export class FavoriteService {
     ]);
     
     return {
-      data: favorites.map(fav => fav.track),
+      data: favorites.map(fav => ({
+        ...fav.track,
+        images: fav.track.images.map(e => e.url),
+      })),
       total,
       page,
       size,

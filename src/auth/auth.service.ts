@@ -1,5 +1,5 @@
 import * as argon from 'argon2';
-import { AuthDto } from 'src/auth/dto';
+import { AuthDto, ResetPasswordDto } from 'src/auth/dto';
 import { Prisma, Role } from '@prisma/client';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
@@ -73,21 +73,43 @@ export class AuthService {
     const user = await this.databaseService.user.findUnique({ where: { email } });
     if (!user) throw new ForbiddenException('Email not found', { description: 'The email does not exist' });
     
-    const resetToken =await this.resetTokenService.generate(user.id);
+    const resetToken = await this.resetTokenService.generate(user.id);
     
-    const resetUrl = `http://localhost:3000/api/auth/reset-password?token=${resetToken.token}`
+    const resetUrl = `http://localhost:3000/api/auth/reset-password?token=${resetToken.token}`;
     
-    await this.mailService.sendForgotPasswordEmail(email, resetToken.otp, resetUrl)
+    await this.mailService.sendForgotPasswordEmail(email, resetToken.otp, resetUrl);
     
     return {
       message: 'Mã OTP đã được gửi đến email của bạn.',
+      token: resetToken.token,
       otp: resetToken.otp,
       resetUrl,
-    }
+    };
   }
   
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(dto: ResetPasswordDto) {
+    const record = await this.databaseService.passwordResetToken.findUnique({
+      where: { token: dto.token, otp: dto.otp },
+    });
     
+    if (!record || record.expiresAt < new Date()) {
+      throw new ForbiddenException('Token not found or expired', { description: 'The token is invalid or has expired' });
+    }
     
+    const hash = await argon.hash(dto.newPassword, { type: argon.argon2id });
+    const user = await this.databaseService.user.update({
+      where: { id: record.userId },
+      data: { password: hash },
+    });
+    await this.resetTokenService.delete(dto.token);
+    
+    return {
+      message: 'Mật khẩu đã được đặt lại thành công.',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    };
   }
 }

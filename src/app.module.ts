@@ -12,12 +12,13 @@ import { TodoModule } from './todo/todo.module';
 import { MailModule } from 'src/mail/mail.module';
 import { FavoriteModule } from 'src/favorite/favorite.module';
 import { SearchModule } from './search/search.module';
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     SharedJwtModule, DatabaseModule, MailModule, FavoriteModule,
-    UserModule, AuthModule, TrackModule, ArtistModule, TodoModule, SearchModule],
+    UserModule, AuthModule, TrackModule, ArtistModule, TodoModule, SearchModule, PlaylistModule],
   controllers: [AppController],
   providers: [AppService],
 })

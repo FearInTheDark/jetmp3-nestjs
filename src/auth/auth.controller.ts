@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
-import { AuthDto } from 'src/auth/dto';
+import { AuthDto, ResetPasswordDto } from 'src/auth/dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,10 +26,8 @@ export class AuthController {
   
   @Post('reset-password')
   async resetPassword(
-    @Body('token') token: string,
-    @Body('newPassword') newPassword: string,
+    @Body() resetPasswordDto: ResetPasswordDto
   ) {
-    const user = await this.authService.resetPassword(token, newPassword);
-    return { message: 'Mật khẩu đã được đặt lại thành công.', user };
+    return await this.authService.resetPassword(resetPasswordDto);
   }
 }

@@ -27,6 +27,7 @@ model User {
   listenHistories    ListenHistory[]
   Favorite           Favorite[]
   PasswordResetToken PasswordResetToken[]
+  PlayList           PlayList[]
 
   @@map("users")
 }
@@ -64,8 +65,10 @@ model Track {
   images          Image[]
   Favorite        Favorite[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  PlayList   PlayList? @relation(fields: [playListId], references: [id])
+  playListId Int?
 
   @@map("tracks")
 }
@@ -104,6 +107,17 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@map("password_reset_tokens")
+}
+
+model PlayList {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks      Track[]
+
+  @@map("playlists")
 }
 
 model Todo {
