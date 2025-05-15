@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { SearchService } from 'src/search/search.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
@@ -10,12 +10,11 @@ export class SearchController {
   
   @Get()
   async search(
+    @Req() req: any,
     @Query('q') query: string,
-    @Query('type') type: string = "any",
-    @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
+    @Query('threshold') threshold?: number,
   ) {
     if (query.length === 0)  return []
-    return await this.searchService.search(query, type, limit, offset);
+    return await this.searchService.search(req.user.userId, query, threshold);
   }
 }

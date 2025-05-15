@@ -37,23 +37,16 @@ export class FavoriteService {
     };
   }
   
-  async getUserFavoriteTracks(userId: number, page = 0, size = 10) {
-    if (page < 0 || size <= 0) {
-      throw new Error('Invalid pagination parameters');
-    }
-    
-    const skip = page * size;
+  async getUserFavoriteTracks(userId: number) {
     
     const [favorites, total] = await this.databaseService.$transaction([
       this.databaseService.favorite.findMany({
         where: { userId },
         include: {
           track: {
-            include: { images: true },
+            include: { images: true, Favorite: { where: { userId } } },
           },
         },
-        skip,
-        take: size,
       }),
       this.databaseService.favorite.count({
         where: { userId },
@@ -62,15 +55,16 @@ export class FavoriteService {
     
     return {
       title: 'My Favorites Tracks',
+      description: 'All your favorite tracks',
       thumbnailUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+      type: 'FAVORITE',
       data: {
         tracks: favorites.map(fav => ({
           ...fav.track,
           images: fav.track.images.map(e => e.url),
+          Favorite: !!fav.track.Favorite.length,
         })),
         total,
-        page,
-        size,
       },
     };
   }

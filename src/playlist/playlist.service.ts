@@ -67,13 +67,33 @@ export class PlaylistService {
     });
   }
   
-  async findOne(id: number) {
-    return this.databaseService.playList.findUnique({
+  async findOne(userId: number, id: number) {
+    const playlist = await this.databaseService.playList.findUnique({
       where: { id },
       include: {
-        tracks: true,
+        tracks: {
+          include: {
+            images: true,
+            Favorite: { where: { userId } }
+          },
+        },
       },
     });
+    
+    return {
+      title: playlist?.name,
+      description: playlist?.description,
+      thumbnailUri: playlist?.tracks?.length && playlist?.tracks.at(0)?.images[0]?.url,
+      type: 'PLAYLIST',
+      data: {
+        tracks: playlist?.tracks.map((track) => ({
+          ...track,
+          images: track.images.map((e) => e.url),
+          Favorite: !!track.Favorite.length,
+        })),
+        total: playlist?.tracks.length,
+      }
+    }
   }
   
   async update(id: number, updatePlaylistDto: Prisma.PlayListUpdateInput) {

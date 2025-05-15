@@ -45,9 +45,7 @@ export class ArtistService {
     });
   }
   
-  async getTracksByArtistId(artistId: string, page = 1, size = 10) {
-    const skip = (page - 1) * size;
-    
+  async getTracksByArtistId(artistId: string) {
     return this.databaseService.track.findMany({
       where: {
         artistId: artistId,
@@ -57,8 +55,6 @@ export class ArtistService {
         Favorite: true,
         listenHistories: true,
       },
-      skip,
-      take: size,
     });
   }
 }

@@ -1,51 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { Prisma } from '@prisma/client';
-import { ArtistSearchResult, TrackSearchResult } from 'src/search/dto';
+import Fuse from 'fuse.js';
 
 @Injectable()
 export class SearchService {
   constructor(private readonly database: DatabaseService) {
   }
   
-  async search(query: string, type: string, limit?: number, offset?: number) {
-    let dataArtists: ArtistSearchResult[];
-    let dataTracks: TrackSearchResult[];
+  async search(userId: number, query: string, threshold = 0.5) {
     
-    const artistQuery: Prisma.ArtistFindManyArgs = {
-      where: {
-        name: { contains: query, mode: 'insensitive' },
-      },
-      take: limit,
-      skip: offset,
-      include: {
-        images: true,
-      },
-    };
-    const trackQuery: Prisma.TrackFindManyArgs = {
-      where: {
-        name: { contains: query, mode: 'insensitive' },
-      },
-      take: limit,
-      skip: offset,
-      include: {
-        images: true,
-        Favorite: true,
-      },
-    };
+    const [rawArtists, rawTracks] = await Promise.all([
+      this.database.artist.findMany({
+        include: { images: true },
+      }),
+      this.database.track.findMany({
+        include: {
+          images: true,
+          Favorite: {
+            where: { userId },
+          },
+        },
+      }),
+    ]);
     
-    dataArtists = await this.database.artist.findMany(artistQuery);
-    dataTracks = await this.database.track.findMany(trackQuery);
+    const artistFuse = new Fuse(rawArtists, {
+      keys: ['name'],
+      threshold: 0.3,
+    });
+    
+    const trackFuse = new Fuse(rawTracks, {
+      keys: ['name', 'artist.name'],
+      threshold,
+    });
+    
+    const filteredArtists = artistFuse.search(query).map(a => a.item);
+    const filteredTracks = trackFuse.search(query).map(t => t.item);
     
     return {
-      artists: dataArtists.map(artist => ({
+      artists: filteredArtists.map(artist => ({
         ...artist,
-        images: artist.images?.map(e => e.url),
+        images: artist.images?.map(i => i.url),
       })),
-      tracks: dataTracks.map(track => ({
+      tracks: filteredTracks.map(track => ({
         ...track,
-        images: track.images?.map(e => e.url),
-        Favorite: !!track.Favorite?.length
+        images: track.images?.map(i => i.url),
+        Favorite: !!track.Favorite?.length,
       })),
     };
   }

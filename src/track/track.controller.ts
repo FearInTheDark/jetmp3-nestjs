@@ -39,10 +39,8 @@ export class TrackController {
 	@Get('history')
 	getUserHistory(
 		@Req() user: any,
-		@Query('page') page: number = 0,
-		@Query('size') size: number = 10,
 	) {
-		return this.trackService.getUserHistory(user.userId, page, size);
+		return this.trackService.getUserHistory(user.userId);
 	}
 	
 	@Get(':id')

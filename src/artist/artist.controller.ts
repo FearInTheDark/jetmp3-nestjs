@@ -23,8 +23,8 @@ export class ArtistController {
 	}
 	
 	@Get(':artistId/tracks')
-	getTracks(@Param('artistId') artistId: string, @Query('page') page: number, @Query('size') size: number) {
-		return this.artistService.getTracksByArtistId(artistId, page, size);
+	getTracks(@Param('artistId') artistId: string) {
+		return this.artistService.getTracksByArtistId(artistId);
 	}
 	
 	@Get(':artistId')

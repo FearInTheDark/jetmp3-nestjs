@@ -15,7 +15,7 @@ export class PlaylistController {
     @Body() createPlaylistDto: Prisma.PlayListCreateInput,
     @Req() req: Request,
   ) {
-    const user = req['user'] as JwtPayload
+    const user = req['user'] as JwtPayload;
     return this.playlistService.create(createPlaylistDto, user.userId);
   }
   
@@ -24,8 +24,8 @@ export class PlaylistController {
     @Body() createPlaylistDto: Prisma.PlayListCreateInput,
     @Req() req: Request,
     @Param('trackId') trackId?: number,
-    ) {
-    const user = req['user'] as JwtPayload
+  ) {
+    const user = req['user'] as JwtPayload;
     return this.playlistService.create(createPlaylistDto, user.userId, trackId);
   }
   
@@ -43,8 +43,11 @@ export class PlaylistController {
   }
   
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.playlistService.findOne(+id);
+  findOne(
+    @Req() req: any,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.playlistService.findOne(req.user.userId, id);
   }
   
   @Patch(':id')

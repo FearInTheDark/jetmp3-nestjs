@@ -23,11 +23,9 @@ export class FavoriteController {
   @Get()
   async getMyFavorites(
     @Req() req: Request,
-    @Query("page") page?: number,
-    @Query("size") size?: number
   ) {
     const user = req['user'] as JwtPayload
-    return this.favoriteService.getUserFavoriteTracks(user.userId, page, size)
+    return this.favoriteService.getUserFavoriteTracks(user.userId)
   }
   
   @Role("ADMIN")

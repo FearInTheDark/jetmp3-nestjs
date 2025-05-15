@@ -42,7 +42,6 @@ export class TrackService {
         images: img,
         Favorite: {
           where: { userId: userId },
-          select: { userId: true },
         },
         listenHistories: true,
       },
@@ -89,7 +88,7 @@ export class TrackService {
         tracks: {
           include: {
             images: true,
-          }
+          },
         },
       },
     });
@@ -109,16 +108,11 @@ export class TrackService {
         title: 'History Tracks',
         iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
         url: 'history/',
-      }
+      },
     };
   }
   
-  async getUserHistory(userId: number, page: number, size: number) {
-    if (page < 0 || size <= 0) {
-      throw new Error('Invalid pagination parameters');
-    }
-    
-    const skip = page * size;
+  async getUserHistory(userId: number) {
     
     const [histories, total] = await this.databaseService.$transaction([
       this.databaseService.listenHistory.findMany({
@@ -128,8 +122,6 @@ export class TrackService {
             include: { images: true },
           },
         },
-        skip,
-        take: size,
       }),
       this.databaseService.listenHistory.count({
         where: { userId },
@@ -138,7 +130,9 @@ export class TrackService {
     
     return {
       title: 'My History Tracks',
+      description: 'Tracks you listened to recently',
       thumbnailUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+      type: 'HISTORY',
       data: {
         tracks: histories.map(history => ({
           ...history.track,
