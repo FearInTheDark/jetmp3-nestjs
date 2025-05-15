@@ -31,7 +31,11 @@ async function main() {
     data: users,
   });
   
-  await prisma.artist.createMany({data: artists})
+  for (const artist of artists) {
+    await prisma.artist.create({
+      data: artist
+    })
+  }
   
   console.log('Seeding Database Completed');
 }

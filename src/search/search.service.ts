@@ -9,62 +9,33 @@ export class SearchService {
   }
   
   async search(query: string, type: string, limit?: number, offset?: number) {
-    let dataArtists: ArtistSearchResult[] = [];
-    let dataTracks: TrackSearchResult[] = [];
-    if (type === 'artist') {
-      const artistQuery: Prisma.ArtistFindManyArgs = {
-        where: {
-          name: { contains: query, mode: 'insensitive' },
-        },
-        take: limit,
-        skip: offset,
-        include: {
-          images: true,
-        },
-      };
-      
-      dataArtists = await this.database.artist.findMany(artistQuery);
-    } else if (type === 'track') {
-      const trackQuery: Prisma.TrackFindManyArgs = {
-        where: {
-          name: { contains: query, mode: 'insensitive' },
-        },
-        take: limit,
-        skip: offset,
-        include: {
-          images: true,
-          // Favorite: true,
-          // listenHistories: true,
-        },
-      };
-      
-      dataTracks = await this.database.track.findMany(trackQuery);
-    } else {
-      [dataArtists, dataTracks] = await Promise.all([
-        this.database.artist.findMany({
-          where: {
-            name: { contains: query, mode: 'insensitive' },
-          },
-          take: limit,
-          skip: offset,
-          include: {
-            images: true,
-          },
-        }),
-        this.database.track.findMany({
-          where: {
-            name: { contains: query, mode: 'insensitive' },
-          },
-          take: limit,
-          skip: offset,
-          include: {
-            images: true,
-            // Favorite: true,
-            // listenHistories: true,
-          },
-        }),
-      ]);
-    }
+    let dataArtists: ArtistSearchResult[];
+    let dataTracks: TrackSearchResult[];
+    
+    const artistQuery: Prisma.ArtistFindManyArgs = {
+      where: {
+        name: { contains: query, mode: 'insensitive' },
+      },
+      take: limit,
+      skip: offset,
+      include: {
+        images: true,
+      },
+    };
+    const trackQuery: Prisma.TrackFindManyArgs = {
+      where: {
+        name: { contains: query, mode: 'insensitive' },
+      },
+      take: limit,
+      skip: offset,
+      include: {
+        images: true,
+        Favorite: true,
+      },
+    };
+    
+    dataArtists = await this.database.artist.findMany(artistQuery);
+    dataTracks = await this.database.track.findMany(trackQuery);
     
     return {
       artists: dataArtists.map(artist => ({
@@ -74,6 +45,7 @@ export class SearchService {
       tracks: dataTracks.map(track => ({
         ...track,
         images: track.images?.map(e => e.url),
+        Favorite: !!track.Favorite?.length
       })),
     };
   }

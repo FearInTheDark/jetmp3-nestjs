@@ -38,7 +38,9 @@ export class FavoriteService {
   }
   
   async getUserFavoriteTracks(userId: number, page = 0, size = 10) {
-    if (page < 0 || size <= 0) {throw new Error('Invalid pagination parameters') }
+    if (page < 0 || size <= 0) {
+      throw new Error('Invalid pagination parameters');
+    }
     
     const skip = page * size;
     
@@ -59,13 +61,17 @@ export class FavoriteService {
     ]);
     
     return {
-      data: favorites.map(fav => ({
-        ...fav.track,
-        images: fav.track.images.map(e => e.url),
-      })),
-      total,
-      page,
-      size,
+      title: 'My Favorites Tracks',
+      thumbnailUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+      data: {
+        tracks: favorites.map(fav => ({
+          ...fav.track,
+          images: fav.track.images.map(e => e.url),
+        })),
+        total,
+        page,
+        size,
+      },
     };
   }
   

@@ -10,13 +10,15 @@ export type ArtistSearchResult = {
   images?: { url: string }[]
 }
 export type TrackSearchResult = {
-    id: number,
-    artistId: string,
-    name: string,
-    uri: string,
-    artistType: $Enums.ArtistType,
-    createdAt: Date,
-    updatedAt: Date
-  } & {
+  id: number,
+  artistId: string,
+  name: string,
+  uri: string,
+  artistType: $Enums.ArtistType,
+  createdAt: Date,
+  updatedAt: Date
+} & {
   images?: { url: string }[]
+} & {
+  Favorite?: { id: number, userId: number, trackId: number }[]
 }

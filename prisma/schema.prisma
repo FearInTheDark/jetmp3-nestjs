@@ -79,7 +79,6 @@ model ListenHistory {
   userId     Int
   track      Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
   trackId    Int
-  duration   Int
   listenedAt DateTime @default(now())
 
   @@unique([userId, trackId, listenedAt])

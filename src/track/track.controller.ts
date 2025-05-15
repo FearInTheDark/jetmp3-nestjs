@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Prisma } from '@prisma/client';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -23,15 +23,39 @@ export class TrackController {
 	@Get()
 	findAll(
 		@Query("img") img: boolean = true,
-		@Query("favorite") favorite: boolean = false,
 		@Req() req: any
 	) {
-		return this.trackService.findAll(img, favorite, req.user.id);
+		console.log("Route: GET /tracks");
+		return this.trackService.findAll(img, req.user.userId);
+	}
+	
+	@Get('categories')
+	getUserCategories(
+		@Req() user: any
+	) {
+		return this.trackService.getUserCategories(user.userId);
+	}
+	
+	@Get('history')
+	getUserHistory(
+		@Req() user: any,
+		@Query('page') page: number = 0,
+		@Query('size') size: number = 10,
+	) {
+		return this.trackService.getUserHistory(user.userId, page, size);
 	}
 	
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.trackService.findOne(+id);
+	}
+	
+	@Post('listen/:trackId')
+	addListenedTrack(
+		@Req() req: any,
+		@Param('trackId', ParseIntPipe) trackId: number,
+	) {
+		return this.trackService.addListenedTrack(req.user.userId, trackId);
 	}
 	
 	@Patch(':id')

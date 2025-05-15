@@ -17,7 +17,7 @@ export class FavoriteController {
     @Query("trackId", ParseIntPipe) trackId: number
   ) {
     const user = req['user'] as JwtPayload
-    return this.favoriteService.toggleUserFavorite(user.userId, +trackId)
+    return this.favoriteService.toggleUserFavorite(user.userId, trackId)
   }
   
   @Get()

@@ -36,7 +36,7 @@ export class TrackService {
     };
   }
   
-  async findAll(img: boolean, favorite: boolean, userId: number) {
+  async findAll(img: boolean, userId: number) {
     const tracks = await this.databaseService.track.findMany({
       include: {
         images: img,
@@ -47,11 +47,11 @@ export class TrackService {
         listenHistories: true,
       },
     });
-    console.log(tracks.map(e => e.Favorite));
+    console.log(tracks.length);
     return tracks.map(track => ({
       ...track,
       images: img ? track.images.map(e => e.url) : undefined,
-      Favorite: favorite ? track.Favorite : track.Favorite.length > 0,
+      Favorite: !!track.Favorite.length,
     }));
   }
   
@@ -72,5 +72,81 @@ export class TrackService {
     return this.databaseService.track.delete({
       where: { id },
     });
+  }
+  
+  async addListenedTrack(userId: number, trackId: number) {
+    return this.databaseService.listenHistory.create({
+      data: {
+        userId, trackId,
+      },
+    });
+  }
+  
+  async getUserCategories(userId: number) {
+    const playlists = await this.databaseService.playList.findMany({
+      where: { userId },
+      include: {
+        tracks: {
+          include: {
+            images: true,
+          }
+        },
+      },
+    });
+    
+    return {
+      favorite: {
+        title: 'Favorite Tracks',
+        iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+        url: 'favorites/',
+      },
+      playlists: playlists.map(e => ({
+        title: e.name,
+        iconUri: e.tracks.shift()?.images.shift()?.url,
+        url: `playlists/${e.id}`,
+      })),
+      history: {
+        title: 'History Tracks',
+        iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+        url: 'history/',
+      }
+    };
+  }
+  
+  async getUserHistory(userId: number, page: number, size: number) {
+    if (page < 0 || size <= 0) {
+      throw new Error('Invalid pagination parameters');
+    }
+    
+    const skip = page * size;
+    
+    const [histories, total] = await this.databaseService.$transaction([
+      this.databaseService.listenHistory.findMany({
+        where: { userId },
+        include: {
+          track: {
+            include: { images: true },
+          },
+        },
+        skip,
+        take: size,
+      }),
+      this.databaseService.listenHistory.count({
+        where: { userId },
+      }),
+    ]);
+    
+    return {
+      title: 'My History Tracks',
+      thumbnailUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+      data: {
+        tracks: histories.map(history => ({
+          ...history.track,
+          images: history.track.images.map(e => e.url),
+        })),
+        total,
+      },
+    };
+    
   }
 }
