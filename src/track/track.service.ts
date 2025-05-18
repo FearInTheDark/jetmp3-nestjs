@@ -89,11 +89,18 @@ export class TrackService {
   }
   
   async addListenedTrack(userId: number, trackId: number) {
-    return this.databaseService.listenHistory.create({
+    const history = await this.databaseService.listenHistory.create({
       data: {
         userId, trackId,
       },
     });
+    
+    if (!history) return null;
+    
+    return {
+      message: 'Track added to history successfully',
+      action: 'ADDED',
+    }
   }
   
   async getUserCategories(userId: number) {
