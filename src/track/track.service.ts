@@ -46,7 +46,6 @@ export class TrackService {
         listenHistories: true,
       },
     });
-    console.log(tracks.length);
     return tracks.map(track => ({
       ...track,
       images: img ? track.images.map(e => e.url) : undefined,
@@ -54,10 +53,26 @@ export class TrackService {
     }));
   }
   
-  async findOne(id: number) {
-    return this.databaseService.track.findUnique({
+  async findOne(userId: number, id: number) {
+    const track = await this.databaseService.track.findUnique({
       where: { id },
+      include: {
+        images: true,
+        Favorite: {
+          where: { userId },
+        },
+        listenHistories: true,
+      },
     });
+    if (!track) {
+      return null;
+    }
+    
+    return {
+      ...track,
+      images: track.images.map(e => e.url),
+      Favorite: !!track.Favorite.length,
+    };
   }
   
   async update(id: number, updateTrackDto: Prisma.TrackUpdateInput) {
@@ -106,7 +121,7 @@ export class TrackService {
       })),
       history: {
         title: 'History Tracks',
-        iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+        iconUri: null,
         url: 'history/',
       },
     };

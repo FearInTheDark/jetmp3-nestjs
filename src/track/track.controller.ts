@@ -44,8 +44,11 @@ export class TrackController {
 	}
 	
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.trackService.findOne(+id);
+	findOne(
+		@Req() req: any,
+		@Param('id', ParseIntPipe) id: number
+	) {
+		return this.trackService.findOne(req.user.userId, id);
 	}
 	
 	@Post('listen/:trackId')
