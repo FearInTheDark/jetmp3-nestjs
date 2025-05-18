@@ -101,7 +101,7 @@ export class TrackService {
       },
       playlists: playlists.map(e => ({
         title: e.name,
-        iconUri: e.tracks.shift()?.images.shift()?.url,
+        iconUri: e.tracks[0]?.images[0]?.url ?? null,
         url: `playlists/${e.id}`,
       })),
       history: {

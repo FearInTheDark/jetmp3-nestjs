@@ -38,9 +38,9 @@ export class TrackController {
 	
 	@Get('history')
 	getUserHistory(
-		@Req() user: any,
+		@Req() req: any,
 	) {
-		return this.trackService.getUserHistory(user.userId);
+		return this.trackService.getUserHistory(req.user.userId);
 	}
 	
 	@Get(':id')
