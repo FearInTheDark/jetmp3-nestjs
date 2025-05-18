@@ -69,7 +69,7 @@ export class PlaylistService {
   
   async findOne(userId: number, id: number) {
     const playlist = await this.databaseService.playList.findUnique({
-      where: { id },
+      where: {userId, id },
       include: {
         tracks: {
           include: {
