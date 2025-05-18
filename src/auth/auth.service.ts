@@ -75,15 +75,12 @@ export class AuthService {
     
     const resetToken = await this.resetTokenService.generate(user.id);
     
-    const resetUrl = `http://localhost:3000/api/auth/reset-password?token=${resetToken.token}`;
-    
-    await this.mailService.sendForgotPasswordEmail(email, resetToken.otp, resetUrl);
+    await this.mailService.sendForgotPasswordEmail(email, resetToken.otp);
     
     return {
-      message: 'Mã OTP đã được gửi đến email của bạn.',
+      message: 'An email has been sent to reset your password',
       token: resetToken.token,
       otp: resetToken.otp,
-      resetUrl,
     };
   }
   
@@ -97,19 +94,15 @@ export class AuthService {
     }
     
     const hash = await argon.hash(dto.newPassword, { type: argon.argon2id });
-    const user = await this.databaseService.user.update({
+    await this.databaseService.user.update({
       where: { id: record.userId },
       data: { password: hash },
     });
     await this.resetTokenService.delete(dto.token);
     
     return {
-      message: 'Mật khẩu đã được đặt lại thành công.',
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
+      message: 'Password reset successfully',
+      action: 'RESET',
     };
   }
 }

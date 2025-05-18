@@ -8,7 +8,7 @@ export class MailService {
     ) {
   }
   
-  async sendForgotPasswordEmail(email: string, otp: string, resetUrl: string): Promise<void> {
+  async sendForgotPasswordEmail(email: string, otp: string): Promise<void> {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Password Reset Request',
@@ -16,7 +16,6 @@ export class MailService {
       context: {
         email,
         otp,
-        resetUrl,
       },
     });
   }
