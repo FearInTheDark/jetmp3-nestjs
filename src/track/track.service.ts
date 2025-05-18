@@ -100,7 +100,7 @@ export class TrackService {
     return {
       message: 'Track added to history successfully',
       action: 'ADDED',
-    }
+    };
   }
   
   async getUserCategories(userId: number) {
@@ -135,32 +135,45 @@ export class TrackService {
   }
   
   async getUserHistory(userId: number) {
-    
-    const [histories, total] = await this.databaseService.$transaction([
-      this.databaseService.listenHistory.findMany({
-        where: { userId },
-        include: {
-          track: {
-            include: { images: true },
+    const histories = await this.databaseService.listenHistory.findMany({
+      where: { userId },
+      include: {
+        track: {
+          include: {
+            images: true,
+            Favorite: {
+              where: { userId },
+            },
           },
         },
-      }),
-      this.databaseService.listenHistory.count({
-        where: { userId },
-      }),
-    ]);
+      },
+      orderBy: {
+        listenedAt: 'desc',
+      },
+    });
     
+    // Deduplicate by trackId, keeping the most recent
+    const seenTrackIds = new Set<number>();
+    const uniqueTracks: any[] = [];
+    
+    for (const history of histories) {
+      if (!seenTrackIds.has(history.trackId)) {
+        seenTrackIds.add(history.trackId);
+        uniqueTracks.push({
+          ...history.track,
+          images: history.track.images.map(e => e.url),
+          Favorite: !!history.track.Favorite.length,
+        });
+      }
+    }
     return {
       title: 'My History Tracks',
       description: 'Tracks you listened to recently',
-      thumbnailUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
+      thumbnailUri: null,
       type: 'HISTORY',
       data: {
-        tracks: histories.map(history => ({
-          ...history.track,
-          images: history.track.images.map(e => e.url),
-        })),
-        total,
+        tracks: uniqueTracks,
+        total: uniqueTracks.length,
       },
     };
     
