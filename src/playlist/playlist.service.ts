@@ -80,6 +80,7 @@ export class PlaylistService {
     });
     
     return {
+      id: playlist?.id,
       title: playlist?.name,
       description: playlist?.description,
       thumbnailUri: playlist?.tracks?.length && playlist?.tracks.at(0)?.images[0]?.url,
@@ -105,8 +106,13 @@ export class PlaylistService {
   }
   
   async remove(id: number) {
-    return this.databaseService.playList.delete({
+    await this.databaseService.playList.delete({
       where: { id },
     });
+    
+    return {
+      message: 'Playlist deleted successfully',
+      action: 'DELETED',
+    }
   }
 }
