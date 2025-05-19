@@ -32,29 +32,28 @@ export class PlaylistService {
         id: playlistId,
       },
       include: {
-        tracks: true,
-      },
+        tracks: { select: { id: true }, }, },
     });
     
     if (!playlist) {
       throw new Error('Playlist not found');
     }
     
-    const trackExists = playlist.tracks.some((track) => track.id === trackId);
+    const trackExists = playlist.tracks.some(track => track.id === trackId);
     
     await this.databaseService.playList.update({
       where: { id: playlistId },
       data: {
-        tracks: trackExists ? {
-          disconnect: { id: trackId },
-        } : {
-          connect: { id: trackId },
-        },
+        tracks: trackExists
+          ? { disconnect: { id: trackId }, }
+          : { connect: { id: trackId }, },
       },
     });
     
     return {
-      message: trackExists ? 'Track removed from playlist' : 'Track added to playlist',
+      message: trackExists
+        ? 'Track removed from playlist'
+        : 'Track added to playlist',
       action: trackExists ? 'REMOVED' : 'ADDED',
     };
   }
@@ -69,12 +68,12 @@ export class PlaylistService {
   
   async findOne(userId: number, id: number) {
     const playlist = await this.databaseService.playList.findUnique({
-      where: {userId, id },
+      where: { userId, id },
       include: {
         tracks: {
           include: {
             images: true,
-            Favorite: { where: { userId } }
+            Favorite: { where: { userId } },
           },
         },
       },
@@ -92,8 +91,8 @@ export class PlaylistService {
           Favorite: !!track.Favorite.length,
         })),
         total: playlist?.tracks.length,
-      }
-    }
+      },
+    };
   }
   
   async update(id: number, updatePlaylistDto: Prisma.PlayListUpdateInput) {

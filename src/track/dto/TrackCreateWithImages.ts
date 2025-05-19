@@ -5,6 +5,7 @@ export type TrackCreateInputWithImages = {
     uri: string
     artistId: string
     artistType: $Enums.ArtistType
+    genres: string[]
     images?: string[]
     createdAt?: Date | string
     updatedAt?: Date | string

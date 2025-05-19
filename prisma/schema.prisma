@@ -64,11 +64,10 @@ model Track {
   listenHistories ListenHistory[]
   images          Image[]
   Favorite        Favorite[]
+  playlists       PlayList[]      @relation("PlaylistTracks")
 
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  PlayList   PlayList? @relation(fields: [playListId], references: [id])
-  playListId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("tracks")
 }
@@ -114,7 +113,7 @@ model PlayList {
   description String?
   userId      Int
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tracks      Track[]
+  tracks      Track[] @relation("PlaylistTracks")
 
   @@map("playlists")
 }
