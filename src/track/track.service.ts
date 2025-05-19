@@ -123,18 +123,21 @@ export class TrackService {
     
     return {
       favorite: {
+        id: 0,
         title: 'Favorite Tracks',
         iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
         url: 'favorites/',
         trackIds: favoriteTracks.map(e => e.track.id),
       },
       playlists: playlists.map(e => ({
+        id: e.id,
         title: e.name,
         iconUri: e.tracks[0]?.images[0]?.url ?? null,
         url: `playlists/${e.id}`,
         trackIds: e.tracks.map(track => track.id),
       })),
       history: {
+        id: 0,
         title: 'History Tracks',
         iconUri: null,
         url: 'history/',
