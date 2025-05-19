@@ -43,7 +43,6 @@ export class TrackService {
         Favorite: {
           where: { userId: userId },
         },
-        listenHistories: true,
       },
     });
     return tracks.map(track => ({
@@ -115,21 +114,31 @@ export class TrackService {
       },
     });
     
+    const favoriteTracks = await this.databaseService.favorite.findMany({
+      where: { userId },
+      include: {
+        track: true,
+      },
+    })
+    
     return {
       favorite: {
         title: 'Favorite Tracks',
         iconUri: 'https://misc.scdn.co/liked-songs/liked-songs-640.jpg',
         url: 'favorites/',
+        trackIds: favoriteTracks.map(e => e.track.id),
       },
       playlists: playlists.map(e => ({
         title: e.name,
         iconUri: e.tracks[0]?.images[0]?.url ?? null,
         url: `playlists/${e.id}`,
+        trackIds: e.tracks.map(track => track.id),
       })),
       history: {
         title: 'History Tracks',
         iconUri: null,
         url: 'history/',
+        trackId: 0
       },
     };
   }
@@ -177,5 +186,21 @@ export class TrackService {
       },
     };
     
+  }
+  
+  async getTrackHistoryData(userId: number, trackId: number) {
+    const histories = await this.databaseService.listenHistory.findMany({
+      where: {
+        userId, trackId
+      },
+      orderBy: {
+        listenedAt: 'desc',
+      },
+    })
+    
+    return histories.map(e => ({
+      trackId: e.trackId,
+      listenedAt: e.listenedAt
+    }));
   }
 }
